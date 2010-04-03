@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ymaps}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Semyonov"]
-  s.date = %q{2010-03-12}
+  s.date = %q{2010-04-03}
   s.description = %q{Different helpers for generating YMapsML, using YMaps widgets and geocoding via Yandex.Maps}
   s.email = %q{rotuka@rotuka.com}
   s.extra_rdoc_files = [
