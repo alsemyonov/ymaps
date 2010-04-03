@@ -9,11 +9,3 @@ module YMaps
     Geokit::Geocoders::Yandex.geocode(query)
   end
 end
-
-if defined? Mime
-  Mime::Type.register 'application/xml', :ymapsml
-end
-
-if defined? ActionView
-  ActionView::Base.send(:include, YMaps::ActionView::Helpers)
-end

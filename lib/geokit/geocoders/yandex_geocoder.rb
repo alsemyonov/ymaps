@@ -6,7 +6,7 @@ module Geokit
 
   class LatLng
     def pos
-      "#{lat} #{lng}"
+      "#{lng} #{lat}"
     end
   end
 
@@ -74,8 +74,8 @@ module Geokit
 
         # basics
         coordinates = doc.elements['.//Point/pos'].text.to_s.split(' ')
-        res.lat = coordinates[0]
-        res.lng = coordinates[1]
+        res.lng = coordinates[0]
+        res.lat = coordinates[1]
 
         # extended -- false if not available
         res.city = doc.elements['.//LocalityName'].try(:text)

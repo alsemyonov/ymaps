@@ -30,7 +30,8 @@ Gem::Specification.new do |s|
      "lib/ymaps/action_view/html_helper.rb",
      "lib/ymaps/action_view/ymapsml_helper.rb",
      "test/helper.rb",
-     "test/test_ymaps.rb"
+     "test/test_ymaps.rb",
+     "ymaps.gemspec"
   ]
   s.homepage = %q{http://github.com/rotuka/ymaps}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -47,15 +48,18 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+      s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<yard>, [">= 0"])
+      s.add_runtime_dependency(%q<geokit>, ["= 1.5.0"])
     else
-      s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+      s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<yard>, [">= 0"])
+      s.add_dependency(%q<geokit>, ["= 1.5.0"])
     end
   else
-    s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+    s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<yard>, [">= 0"])
+    s.add_dependency(%q<geokit>, ["= 1.5.0"])
   end
 end
 
