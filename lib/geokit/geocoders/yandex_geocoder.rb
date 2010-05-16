@@ -10,6 +10,22 @@ module Geokit
     end
   end
 
+  class GeoLoc
+    attr_accessor :kind
+    attr_writer :street_number, :street_name
+
+    # Extracts the street number from the street address if the street address
+    # has a value.
+    def street_number
+      @street_number ||= street_address && street_address[/(\d*)/]
+    end
+
+    # Returns the street name portion of the street address.
+    def street_name
+      @street_name ||= street_address && street_address[street_number.length, street_address.length].strip
+    end
+  end
+
   module Geocoders
     def self.yandex
       YMaps.key
@@ -20,6 +36,22 @@ module Geokit
     end
 
     class YandexGeocoder < Geocoder
+      KIND_ACCURACY_MAP = {
+        'country'   => 1,
+        'province'  => 2,
+        'area'      => 3,
+        # 5 postal code
+        'locality'  => 4,
+        'street'    => 6,
+        'route'     => 6,
+        # 7 kreuzung
+        'house'     => 8,
+        'metro'     => 8,
+        'railway'   => 8,
+        # 9 building
+        # district hydro vegetation cemetery bridge km other
+        #  0 #unknown
+      }
 
     private
       def self.call_geocoder_service(geocode)
@@ -78,16 +110,20 @@ module Geokit
         res.lat = coordinates[1]
 
         # extended -- false if not available
-        res.city = doc.elements['.//LocalityName'].try(:text)
+        res.full_address = doc.elements['.//GeocoderMetaData/text'].try(:text)
+        res.country = doc.elements['.//CountryName'].try(:text)
         res.state = doc.elements['.//AdministrativeAreaName'].try(:text)
         res.province = doc.elements['.//SubAdministrativeAreaName'].try(:text)
-        res.full_address = doc.elements['.//GeocoderMetaData/text'].try(:text)
-        res.zip = doc.elements['.//PostalCodeNumber'].try(:text)
-        res.street_address = doc.elements['.//ThoroughfareName'].try(:text)
-        res.country = doc.elements['.//CountryName'].try(:text)
+        res.city = doc.elements['.//LocalityName'].try(:text)
         res.district = doc.elements['.//DependentLocalityName'].try(:text)
+        res.street_name = doc.elements['.//ThoroughfareName'].try(:text)
+        res.street_number = doc.elements['.//PremiseNumber'].try(:text)
+        res.zip = doc.elements['.//PostalCodeNumber'].try(:text)
 
         # TODO: translate accuracy into Yahoo-style token address, street, zip, zip+4, city, state, country
+        res.kind = doc.elements['.//GeocoderMetaData/kind'].try(:text)
+        res.accuracy = KIND_ACCURACY_MAP[res.kind] if res.kind.present?
+        res.precision=%w{unknown country state state city zip zip+4 street address building}[res.accuracy]
 
         if suggested_bounds = doc.elements['.//boundedBy']
           res.suggested_bounds = Bounds.normalize(
@@ -97,7 +133,6 @@ module Geokit
         end
 
         res.success = true
-
         res
       end
     end
