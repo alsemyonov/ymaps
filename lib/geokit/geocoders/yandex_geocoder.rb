@@ -24,6 +24,16 @@ module Geokit
     def street_name
       @street_name ||= street_address && street_address[street_number.length, street_address.length].strip
     end
+
+    # Do not use ugly Geokit::Inflector::titleize when set city’s name
+    def city=(city)
+      @city = city
+    end
+
+    # Do not use ugly Geokit::Inflector::titleize when set street address
+    def street_address=(address)
+      @street_address = address
+    end
   end
 
   module Geocoders
