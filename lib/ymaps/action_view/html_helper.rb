@@ -45,6 +45,9 @@ module YMaps
       def static_map(resources, options = {})
         title = options.delete(:title) { resources.to_s }
         map_type = options.delete(:map) { 'map' }
+        width = options.delete(:width) { 600 }
+        height = options.delete(:height) { 450 }
+        map_size = "#{width},#{height}"
 
         common_point = StaticMapPoint.new(
           options.delete(:style) { 'pm' },
@@ -61,10 +64,12 @@ module YMaps
         end.join('~')
 
         content_tag(:div, :class => 'b-map') do
-          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}",
+          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}&size=#{map_size}",
                     :title => title,
                     :alt => title,
-                    :class => 'static'
+                    :class => 'static',
+                    :width => width,
+                    :height => height
                    )
         end
       end
