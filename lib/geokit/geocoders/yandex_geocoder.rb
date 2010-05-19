@@ -5,8 +5,12 @@ module Geokit
   self.default_units = :kms
 
   class LatLng
-    def pos
+    def gml_pos
       "#{lng} #{lat}"
+    end
+
+    def ymaps_lnglat
+      "#{lng},#{lat}"
     end
   end
 

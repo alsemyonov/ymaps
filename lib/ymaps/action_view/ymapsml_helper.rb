@@ -113,7 +113,7 @@ module YMaps
 
       def point(latlng)
         Point {
-          pos(latlng.pos)
+          pos(latlng.gml_pos)
         }
       end
 

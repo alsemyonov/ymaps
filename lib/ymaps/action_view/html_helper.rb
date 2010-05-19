@@ -3,15 +3,15 @@ module YMaps
     module HtmlHelper
       class StaticMapPoint < Struct.new('MapPoint', :style, :color, :size, :number, :lat, :lng)
         def to_s
-          "#{ll},#{style}#{color}#{size}#{number}"
+          "#{ymaps_lnglat},#{style}#{color}#{size}#{number}"
         end
 
-        def ll
-          @ll ||= "#{lat},#{lng}"
+        def ymaps_lnglat
+          @ymaps_lnglat ||= "#{lng},#{lat}"
         end
 
-        def ll=(latlng)
-          @ll = latlng
+        def ymaps_lnglat=(latlng)
+          @ymaps_lnglat = latlng
         end
 
         def attributes=(attrs)
@@ -54,7 +54,7 @@ module YMaps
         )
 
         collection = Array(resources).inject([]) do |result, resource|
-          common_point.ll = resource.latlng.ll
+          common_point.ymaps_lnglat = resource.latlng.ymaps_lnglat
           common_point.number += 1
           result << common_point.to_s
           result
