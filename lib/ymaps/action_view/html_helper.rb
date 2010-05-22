@@ -37,9 +37,13 @@ module YMaps
                            :type => 'application/ymapsml+xml'))
       end
 
-      def ymaps_include_tag(key = nil)
+      def ymaps_javascript_path(key = nil)
         key ||= YMaps.key
-        javascript_include_tag("http://api-maps.yandex.ru/1.1/index.xml?key=#{key}")
+        "http://api-maps.yandex.ru/1.1/index.xml?key=#{key}"
+      end
+
+      def ymaps_include_tag(key = nil)
+        javascript_include_tag(ymaps_javascript_path)
       end
 
       def static_map(resources, options = {})
