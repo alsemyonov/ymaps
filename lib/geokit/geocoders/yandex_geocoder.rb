@@ -12,6 +12,10 @@ module Geokit
     def ymaps_lnglat
       "#{lng},#{lat}"
     end
+
+    def ymaps_lnglat=(lnglat)
+      self.lng, self.lat = lnglat[0], lnglat[1]
+    end
   end
 
   class GeoLoc
@@ -66,6 +70,7 @@ module Geokit
         # district hydro vegetation cemetery bridge km other
         #  0 #unknown
       }
+      PRECISIONS = %w{unknown country state state city zip zip+4 street address building}
 
     private
       def self.call_geocoder_service(geocode)
@@ -76,13 +81,13 @@ module Geokit
         end
 
         xml = res.body
-        logger.debug "Yandex geocoding: '#{geocode}'. Result: #{xml}"
+        logger.debug("Yandex geocoding: '#{geocode}'. Result: #{xml}")
         return xml2GeoLoc(xml)
       end
 
       def self.do_reverse_geocode(latlng)
         latlng = LatLng.normalize(latlng)
-        call_geocoder_service(latlng.ll)
+        call_geocoder_service(latlng.ymaps_lnglat)
       end
 
       def self.do_geocode(address, options = {})
@@ -109,7 +114,7 @@ module Geokit
 
           return geoloc
         else
-          logger.ingo "Yandex was unable to geocode address: #{address}"
+          logger.info("Yandex was unable to geocode address: #{address}")
           return GeoLoc.new
         end
       end
@@ -119,25 +124,22 @@ module Geokit
         res.provider = 'yandex'
 
         # basics
-        coordinates = doc.elements['.//Point/pos'].text.to_s.split(' ')
-        res.lng = coordinates[0]
-        res.lat = coordinates[1]
+        res.ymaps_lnglat  = doc.elements['.//Point/pos'].text.to_s.split(' ')
 
         # extended -- false if not available
-        res.full_address = doc.elements['.//GeocoderMetaData/text'].try(:text)
-        res.country = doc.elements['.//CountryName'].try(:text)
-        res.state = doc.elements['.//AdministrativeAreaName'].try(:text)
-        res.province = doc.elements['.//SubAdministrativeAreaName'].try(:text)
-        res.city = doc.elements['.//LocalityName'].try(:text)
-        res.district = doc.elements['.//DependentLocalityName'].try(:text)
-        res.street_name = doc.elements['.//ThoroughfareName'].try(:text)
+        res.full_address  = doc.elements['.//GeocoderMetaData/text'].try(:text)
+        res.country       = doc.elements['.//CountryName'].try(:text)
+        res.state         = doc.elements['.//AdministrativeAreaName'].try(:text)
+        res.province      = doc.elements['.//SubAdministrativeAreaName'].try(:text)
+        res.city          = doc.elements['.//LocalityName'].try(:text)
+        res.district      = doc.elements['.//DependentLocalityName'].try(:text)
+        res.street_name   = doc.elements['.//ThoroughfareName'].try(:text)
         res.street_number = doc.elements['.//PremiseNumber'].try(:text)
-        res.zip = doc.elements['.//PostalCodeNumber'].try(:text)
+        res.zip           = doc.elements['.//PostalCodeNumber'].try(:text)
 
-        # TODO: translate accuracy into Yahoo-style token address, street, zip, zip+4, city, state, country
         res.kind = doc.elements['.//GeocoderMetaData/kind'].try(:text)
-        res.accuracy = KIND_ACCURACY_MAP[res.kind] if res.kind.present?
-        res.precision=%w{unknown country state state city zip zip+4 street address building}[res.accuracy]
+        res.accuracy = KIND_ACCURACY_MAP.fetch(res.kind) { 0 } if res.kind.present?
+        res.precision = PRECISIONS[res.accuracy]
 
         if suggested_bounds = doc.elements['.//boundedBy']
           res.suggested_bounds = Bounds.normalize(
