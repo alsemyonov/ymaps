@@ -24,10 +24,13 @@ module YMaps
       def map_link(resource = nil, options = {})
         resource, options = nil, resource if resource.is_a?(Hash)
 
+        url_params = options.delete(:url) { {} }
         href = if resource
-                 polymorphic_url(resource, :format => :ymapsml)
+                 polymorphic_url(resource, {:format => :ymapsml}.merge(url_params))
                else
-                 url_for(:format => :ymapsml, :only_path => false, :time => Time.now)
+                 url_for({:format => :ymapsml,
+                          :only_path => false,
+                          :time => Time.now}.merge(url_params))
                end
 
         tag(:link,
