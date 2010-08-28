@@ -87,12 +87,12 @@ module Geokit
 
       def self.do_reverse_geocode(latlng)
         latlng = LatLng.normalize(latlng)
-        call_geocoder_service(latlng.ymaps_lnglat)
+        call_geocoder_service(latlng.ymaps_lnglat) || GeoLoc.new
       end
 
       def self.do_geocode(address, options = {})
         address_str = address.is_a?(GeoLoc) ? address.to_geocodable_s : address
-        call_geocoder_service(address_str)
+        call_geocoder_service(address_str) || GeoLoc.new
       end
 
       def self.xml2GeoLoc(xml, address="")
