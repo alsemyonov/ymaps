@@ -6,7 +6,7 @@ module YMaps
 
   def self.geocode(query)
     require 'geokit/geocoders/yandex_geocoder'
-    Geokit::Geocoders::Yandex.geocode(query)
+    Geokit::Geocoders::YandexGeocoder.geocode(query)
   end
 end
 
