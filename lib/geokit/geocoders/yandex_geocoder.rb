@@ -1,4 +1,5 @@
 require 'geokit'
+require 'geokit/inflector'
 require 'geokit/geocoders'
 
 module Geokit
