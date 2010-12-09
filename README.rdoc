@@ -14,6 +14,4 @@ It includes Geokit-based Geocoder and helper for generating YMapsML files with d
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Copyright
-
-Copyright (c) 2010 Alexander Semyonov. See LICENSE for details.
+© Alexander Semyonov, 2010. See LICENSE for details.
