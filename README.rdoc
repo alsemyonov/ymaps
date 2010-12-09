@@ -1,6 +1,8 @@
-= ymaps
+= YMaps
 
-Description goes here.
+Helpers for using Yandex Maps service.
+
+It includes Geokit-based Geocoder and helper for generating YMapsML files with data for Yandex Maps.
 
 == Note on Patches/Pull Requests
  
