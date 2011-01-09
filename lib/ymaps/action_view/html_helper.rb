@@ -71,13 +71,13 @@ module YMaps
         end.join('~')
 
         content_tag(:div, :class => 'b-map') do
-          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}&size=#{map_size}",
-                    :title => title,
-                    :alt => title,
-                    :class => 'static',
-                    :width => width,
-                    :height => height
-                   )
+          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}&size=#{map_size}", options.merge(
+            :title => title,
+            :alt => title,
+            :class => 'static',
+            :width => width,
+            :height => height
+          ))
         end
       end
 
