@@ -55,6 +55,7 @@ module YMaps
         width = options.delete(:width) { 600 }
         height = options.delete(:height) { 450 }
         map_size = "#{width},#{height}"
+        zoom     = options.delete(:zoom) { 16 }
 
         common_point = StaticMapPoint.new(
           options.delete(:style) { 'pm' },
@@ -71,7 +72,7 @@ module YMaps
         end.join('~')
 
         content_tag(:div, :class => 'b-map') do
-          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}&size=#{map_size}", options.merge(
+          image_tag("http://static-maps.yandex.ru/1.x/?key=#{YMaps.key}&l=#{map_type}&pt=#{collection}&size=#{map_size}&z=#{zoom}", options.merge(
             :title => title,
             :alt => title,
             :class => 'static',
