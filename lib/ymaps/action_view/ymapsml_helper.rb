@@ -28,7 +28,7 @@ module YMaps
     class Builder
       YMAPS_TAG_NAMES = %w(GeoObject GeoObjectCollection style ymaps AnyMetaData).map(&:to_sym)
       GML_TAG_NAMES = %w(boundedBy description Envelope exterior featureMember
-        featureMembers interior LineString LinearString lowerCorner
+        featureMembers interior LineString LinearRing lowerCorner
         metaDataProperty name Point Polygon pos posList upperCorner).map(&:to_sym)
       REPR_TAG_NAMES = %w(balloonContentStyle fill fillColor hintContentStyle iconContentStyle
         lineStyle href iconStyle mapType offset outline parentStyle polygonStyle
