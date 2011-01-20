@@ -98,7 +98,7 @@ module YMaps
 
       ACCEPTABLE_STYLES.each do |name, values|
         define_method(name) do |options|
-          tag_name = "#{name.to_s.camelize(false)}Style"
+          tag_name = "#{ActiveSupport::Inflector.camelize(name.to_s, false)}Style"
           send(tag_name) do
             style_options(options, values)
           end
