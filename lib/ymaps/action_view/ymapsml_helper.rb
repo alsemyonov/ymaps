@@ -28,7 +28,7 @@ module YMaps
     class Builder
       YMAPS_TAG_NAMES = %w(GeoObject GeoObjectCollection style ymaps AnyMetaData).map(&:to_sym)
       GML_TAG_NAMES = %w(boundedBy description Envelope exterior featureMember
-        featureMembers interior LineString LinearString lowerCorner
+        featureMembers interior LineString LinearRing lowerCorner
         metaDataProperty name Point Polygon pos posList upperCorner).map(&:to_sym)
       REPR_TAG_NAMES = %w(balloonContentStyle fill fillColor hintContentStyle iconContentStyle
         lineStyle href iconStyle mapType offset outline parentStyle polygonStyle
@@ -39,9 +39,18 @@ module YMaps
         @xml = xml
       end
 
+    protected
+      def prefixed_method(method, *arguments, &block)
+        @xml.__send__(*xmlns_prefix!(method, arguments), &block)
+      end
+
+      def link_to(name, href)
+        prefixed_method(name, "\##{href}")
+      end
+
     private
       def method_missing(method, *arguments, &block)
-        @xml.__send__(*xmlns_prefix!(method, arguments), &block)
+        prefixed_method(method, *arguments, &block)
       end
 
       def xmlns_prefix!(method, arguments)
@@ -56,6 +65,15 @@ module YMaps
     end
 
     class YMapsReprBuilder < Builder
+      ACCEPTABLE_STYLES = {
+        :balloon_content => [:template],
+        :hint_content => [:template],
+        :icon => [:href, :offset, :shadow, :size, :template],
+        :icon_content => [:template],
+        :line => [:stroke_color, :stroke_width],
+        :polygon => [:fill, :fill_color, :outline, :stroke_color, :stroke_width],
+      }
+
       def view(options = {})
         View {
           if options[:type]
@@ -65,10 +83,26 @@ module YMaps
         }
       end
 
+      # Add style definition
+      # @param [Symbol, String] id      style name
+      # @param [Hash]           options style options
       def style(id, options = {})
+        options[:hasBalloon]  = options.delete(:balloon)  if options.key?(:balloon)
+        options[:hasHint]     = options.delete(:hint)     if options.key?(:hint)
+        parent                = options.delete(:parent) { false  }
         Style(options.merge('gml:id' => id.to_s)) {
+          link_to(:parentStyle, parent) if parent
           yield
         }
+      end
+
+      ACCEPTABLE_STYLES.each do |name, values|
+        define_method(name) do |options|
+          tag_name = "#{name.to_s.camelize(false)}Style"
+          send(tag_name) do
+            style_options(options, values)
+          end
+        end
       end
 
       def template(id, template_text = nil)
@@ -79,10 +113,42 @@ module YMaps
         end
       end
 
-      def balloon_content(template)
-        balloonContentStyle {
-          @xml.repr(:template, "\##{template}")
-        }
+      protected
+
+      def style_options(options = {}, acceptable = nil)
+        if acceptable
+          options.assert_valid_keys(acceptable)
+        end
+        # Filling options
+        fill(options[:fill] ? 1 : 0)            if options.key?(:fill)
+        fillColor(options[:fill_color])         if options.key?(:fill_color)
+
+        # Outline options
+        outline(options[:outline] ? 1 : 0)      if options.key?(:outline)
+        strokeColor(options[:stroke_color])     if options.key?(:stroke_color)
+        strokeWidth(options[:stroke_width])     if options.key?(:stroke_width)
+
+        href(options[:href])                    if options.key?(:href)
+        size(*Array(options[:size]))            if options.key?(:size)
+        offset(*Array(options[:offset]))        if options.key?(:offset)
+        link_to(:template, options[:template])  if options.key?(:template)
+        shadow do
+          style_options(options[:shadow], [:href, :size, :template, :offset])
+        end if options.key?(:shadow)
+      end
+
+      def size(x, y = nil)
+        if x.is_a?(Hash)
+          x, y = x[:x], x[:y]
+        end
+        prefixed_method(:size, :x => x, :y => y)
+      end
+
+      def offset(x, y = nil)
+        if x.is_a?(Hash)
+          x, y = x[:x], x[:y]
+        end
+        prefixed_method(:offset, :x => x, :y => y)
       end
     end
 
