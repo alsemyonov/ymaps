@@ -10,12 +10,22 @@ module Geokit
       "#{lng} #{lat}"
     end
 
-    def ymaps_lnglat
+    def gml_lnglat
       "#{lng},#{lat}"
     end
 
-    def ymaps_lnglat=(lnglat)
+    def gml_lnglat=(lnglat)
       self.lng, self.lat = lnglat[0], lnglat[1]
+    end
+  end
+
+  class Bounds
+    def lower
+      sw
+    end
+
+    def upper
+      ne
     end
   end
 
@@ -88,7 +98,7 @@ module Geokit
 
       def self.do_reverse_geocode(latlng)
         latlng = LatLng.normalize(latlng)
-        call_geocoder_service(latlng.ymaps_lnglat) || GeoLoc.new
+        call_geocoder_service(latlng.gml_lnglat) || GeoLoc.new
       end
 
       def self.do_geocode(address, options = {})
@@ -125,7 +135,7 @@ module Geokit
         res.provider = 'yandex'
 
         # basics
-        res.ymaps_lnglat  = doc.elements['.//Point/pos'].text.to_s.split(' ')
+        res.gml_lnglat  = doc.elements['.//Point/pos'].text.to_s.split(' ')
 
         # extended -- false if not available
         res.full_address  = doc.elements['.//GeocoderMetaData/text'].try(:text)
@@ -144,8 +154,8 @@ module Geokit
 
         if suggested_bounds = doc.elements['.//boundedBy']
           res.suggested_bounds = Bounds.normalize(
-            suggested_bounds.elements['.//lowerCorner'].text.to_s.split(' '),
-            suggested_bounds.elements['.//upperCorner'].text.to_s.split(' ')
+            suggested_bounds.elements['.//lowerCorner'].text.to_s.split(' ').reverse,
+            suggested_bounds.elements['.//upperCorner'].text.to_s.split(' ').reverse
           )
         end
 
