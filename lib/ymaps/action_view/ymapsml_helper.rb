@@ -64,7 +64,63 @@ module YMaps
       end
     end
 
-    class YMapsReprBuilder < Builder
+    class YMapsBuilder < Builder
+      def initialize(xml, view, ymaps_options = {})
+        @xml, @view, @ymaps_options = xml, view, ymaps_options
+      end
+
+      def collection(options = {})
+        GeoObjectCollection do
+          if options.key?(:style)
+            @xml.style("\##{options.delete(:style)}")
+          end
+          featureMembers { yield }
+        end
+      end
+
+      def object(object, options = {})
+        GeoObject do
+          if options.key?(:style)
+            @xml.style("\##{options.delete(:style)}")
+          end
+          point(object.latlng) if object.respond_to?(:latlng)
+          bounds(object.bounds) if object.respond_to?(:bounds)
+          name(options.delete(:name) { object.to_s })
+          yield self
+        end
+      end
+
+      def point(latlng)
+        Point {
+          pos(latlng.gml_pos)
+        } if latlng
+      end
+
+      def bounds(bounds)
+        boundedBy {
+          Envelope {
+            lowerCorner(bounds.lower.gml_pos)
+            upperCorner(bounds.upper.gml_pos)
+          }
+        } if bounds
+      end
+
+      def meta_data
+        metaDataProperty {
+          AnyMetaData {
+            yield(@xml)
+          }
+        }
+      end
+
+      def representation
+        Representation {
+          yield(YMapsReprBuilder.new(@xml, @view))
+        }
+      end
+    end
+
+    class YMapsReprBuilder < YMapsBuilder
       ACCEPTABLE_STYLES = {
         :balloon_content => [:template],
         :hint_content => [:template],
@@ -76,9 +132,8 @@ module YMaps
 
       def view(options = {})
         View {
-          if options[:type]
-            mapType(options[:type].to_s.upcase)
-          end
+          mapType(options[:type].to_s.upcase) if options[:type]
+          bounds(options[:bounds]) if options[:bounds]
           yield if block_given?
         }
       end
@@ -149,52 +204,6 @@ module YMaps
           x, y = x[:x], x[:y]
         end
         prefixed_method(:offset, :x => x, :y => y)
-      end
-    end
-
-    class YMapsBuilder < Builder
-      def initialize(xml, view, ymaps_options = {})
-        @xml, @view, @ymaps_options = xml, view, ymaps_options
-      end
-
-      def collection(options = {})
-        GeoObjectCollection do
-          if options.key?(:style)
-            @xml.style("\##{options.delete(:style)}")
-          end
-          featureMembers { yield }
-        end
-      end
-
-      def object(object, options = {})
-        GeoObject do
-          if options.key?(:style)
-            @xml.style("\##{options.delete(:style)}")
-          end
-          point(object.latlng)
-          name(options.delete(:name) { object.to_s })
-          yield self
-        end
-      end
-
-      def point(latlng)
-        Point {
-          pos(latlng.gml_pos)
-        }
-      end
-
-      def meta_data
-        metaDataProperty {
-          AnyMetaData {
-            yield(@xml)
-          }
-        }
-      end
-
-      def representation
-        Representation {
-          yield(YMapsReprBuilder.new(@xml))
-        }
       end
     end
   end
