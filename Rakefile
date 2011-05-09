@@ -1,24 +1,5 @@
-require 'rubygems'
-require 'rake'
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = 'ymaps'
-    gem.summary = %Q{Helpers for using YMaps}
-    gem.description = %Q{Different helpers for generating YMapsML, using YMaps widgets and geocoding via Yandex.Maps}
-    gem.email = 'rotuka@rotuka.com'
-    gem.homepage = 'http://github.com/rotuka/ymaps'
-    gem.authors = ['Alexander Semyonov']
-    gem.add_development_dependency 'shoulda', '>= 0'
-    gem.add_development_dependency 'yard', '>= 0'
-    gem.add_dependency 'geokit', '1.5.0'
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
-end
+require 'bundler'
+Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
@@ -46,12 +27,9 @@ task :default => :test
 
 begin
   require 'yard'
-  YARD::Rake::YardocTask.new
+  YARD::Rake::YardocTask.new(:doc)
 rescue LoadError
-  task :yardoc do
+  task :doc do
     abort "YARD is not available. In order to run yardoc, you must: sudo gem install yard"
   end
 end
-
-task :rdoc => :yard
-task :doc => :yard
