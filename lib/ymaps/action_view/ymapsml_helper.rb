@@ -78,7 +78,8 @@ module YMaps
       end
 
       def object(object, options = {})
-        GeoObject do
+        gml_id = options.delete(:id) { object.id }
+        GeoObject('gml:id' => gml_id) do
           if options.key?(:style)
             @xml.style("\##{options.delete(:style)}")
           end
