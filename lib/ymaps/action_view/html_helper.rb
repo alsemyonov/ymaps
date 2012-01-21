@@ -40,13 +40,13 @@ module YMaps
                            :type => 'application/ymapsml+xml'))
       end
 
-      def ymaps_javascript_path(key = nil)
-        key ||= YMaps.key
-        "http://api-maps.yandex.ru/1.1/index.xml?key=#{key}"
+      def ymaps_javascript_path(key = nil, by_require = 0)
+        query = {:key => key || YMaps.key, :loadByRequire => by_require}.to_query
+        "http://api-maps.yandex.ru/1.1/index.xml?#{query}"
       end
 
-      def ymaps_include_tag(key = nil)
-        javascript_include_tag(ymaps_javascript_path)
+      def ymaps_include_tag(key = nil, by_require = 0)
+        javascript_include_tag(ymaps_javascript_path(key, by_require))
       end
 
       def static_map(resources, options = {})
