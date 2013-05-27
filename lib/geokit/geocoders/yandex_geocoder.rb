@@ -92,7 +92,6 @@ module Geokit
         end
 
         xml = res.body
-        logger.debug("Yandex geocoding: '#{geocode}'. Result: #{xml}")
         return xml2GeoLoc(xml)
       end
 
