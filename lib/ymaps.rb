@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/attribute_accessors'
+
 module YMaps
   mattr_accessor :key
   self.key = 'REPLACE_WITH_YOUR_YANDEX_KEY'

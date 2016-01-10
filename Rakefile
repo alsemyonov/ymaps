@@ -17,11 +17,9 @@ begin
   end
 rescue LoadError
   task :rcov do
-    abort "RCov is not available. In order to run rcov, you must: sudo gem install spicycode-rcov"
+    abort 'RCov is not available. In order to run rcov, you must: sudo gem install spicycode-rcov'
   end
 end
-
-task :test => :check_dependencies
 
 task :default => :test
 
@@ -30,6 +28,6 @@ begin
   YARD::Rake::YardocTask.new(:doc)
 rescue LoadError
   task :doc do
-    abort "YARD is not available. In order to run yardoc, you must: sudo gem install yard"
+    abort 'YARD is not available. In order to run yardoc, you must: sudo gem install yard'
   end
 end
